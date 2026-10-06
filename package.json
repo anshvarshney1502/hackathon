@@ -1,0 +1,43 @@
+{
+  "name": "not-a-bot",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "seed:bots": "tsx --conditions=react-server --env-file=.env.local scripts/seed-bots.ts",
+    "smoke:rest": "tsx --conditions=react-server --env-file=.env.local scripts/smoke-rest.ts",
+    "sim": "tsx --conditions=react-server --env-file=.env.local scripts/sim-table.ts",
+    "sim:quick": "tsx --conditions=react-server --env-file=.env.local scripts/sim-quick.ts",
+    "cleanup:test-users": "tsx --conditions=react-server --env-file=.env.local scripts/cleanup-test-users.ts"
+  },
+  "dependencies": {
+    "@cometchat/chat-sdk-javascript": "^4.2.0",
+    "@react-three/drei": "^10.7.9",
+    "@react-three/fiber": "^9.8.1",
+    "framer-motion": "^14.0.0",
+    "next": "16.3.8",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "server-only": "^0.0.1",
+    "three": "^0.186.1",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^24.19.1",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@types/three": "^0.186.0",
+    "eslint": "^9",
+    "eslint-config-next": "16.3.8",
+    "tailwindcss": "^4",
+    "tsx": "^4.23.15",
+    "typescript": "^5",
+    "vitest": "^5.0.3"
+  }
+}

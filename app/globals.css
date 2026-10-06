@@ -1,0 +1,135 @@
+@import "tailwindcss";
+
+/*
+ * NOT A BOT: late-night interrogation room.
+ * One accent only: sodium-lamp amber. Everything else is warm ink and paper.
+ */
+:root {
+  --ink: #0d0b09;
+  --ink-2: #15120e;
+  --ink-3: #1d1914;
+  --line: #2e2820;
+  --line-strong: #4a4135;
+  --paper: #ede5d5;
+  --paper-dim: #a89e8c;
+  --paper-faint: #746b5d;
+  --amber: #f2a33a;
+  --amber-deep: #b8731d;
+  --amber-glow: rgba(242, 163, 58, 0.14);
+}
+
+@theme inline {
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-paper: var(--paper);
+  --color-paper-dim: var(--paper-dim);
+  --color-paper-faint: var(--paper-faint);
+  --color-amber: var(--amber);
+  --color-amber-deep: var(--amber-deep);
+  --font-display: var(--font-display);
+  --font-mono: var(--font-mono);
+  --font-sans: var(--font-mono);
+}
+
+html {
+  color-scheme: dark;
+  background: var(--ink);
+}
+
+body {
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Film grain. Static and cheap: one tiny inline SVG, no animation. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+  opacity: 0.07;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 0.9  0 0 0 0 0.8  0 0 0 0.9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+::selection {
+  background: var(--amber);
+  color: var(--ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 3px;
+}
+
+.font-display {
+  font-family: var(--font-display), "Arial Narrow", sans-serif;
+  letter-spacing: 0.01em;
+}
+
+.label {
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--paper-dim);
+}
+
+/* Typing: a subtle flickering dot pattern, like a failing bulb. */
+@keyframes flicker {
+  0%, 100% { opacity: 0.25; }
+  12% { opacity: 0.9; }
+  18% { opacity: 0.35; }
+  30% { opacity: 1; }
+  55% { opacity: 0.3; }
+  70% { opacity: 0.85; }
+}
+.flicker-dot {
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  background: var(--amber);
+  animation: flicker 1.3s infinite steps(1, end);
+}
+.flicker-dot:nth-child(2) { animation-delay: 0.21s; }
+.flicker-dot:nth-child(3) { animation-delay: 0.47s; }
+
+/* Inked rubber stamp look. */
+.stamp {
+  font-family: var(--font-display), sans-serif;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border: 3px solid currentColor;
+  padding: 0.1em 0.45em;
+  mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='60'><filter id='r'><feTurbulence type='fractalNoise' baseFrequency='.55' numOctaves='3'/><feComponentTransfer><feFuncA type='discrete' tableValues='0 1 1 1 1 1'/></feComponentTransfer></filter><rect width='100%' height='100%' filter='url(%23r)'/></svg>");
+  mask-size: 120px 60px;
+}
+
+/* Ruled case-file paper for cards. */
+.case-paper {
+  background-color: #e9e0cd;
+  color: #1a1611;
+  background-image: repeating-linear-gradient(to bottom, transparent 0 27px, rgba(30, 60, 90, 0.12) 27px 28px);
+}
+
+.hairline {
+  border-color: var(--line);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .flicker-dot { opacity: 0.8; }
+}

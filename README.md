@@ -6,7 +6,7 @@
 
 A real-time social deduction game in a live group chat. Talk, bluff, interrogate, then stamp every player **HUMAN** or **BOT**.
 
-[**▶ Play it live**](https://hackathon-phi-lemon.vercel.app) · [**Watch the 90-second demo**](https://github.com/anshvarshney1502/hackathon/blob/main/docs/media/not-a-bot-demo.mp4) · [How it works](#how-a-round-plays) · [Run it locally](#run-it-locally)
+[**▶ Play it live**](https://hackathon-phi-lemon.vercel.app) · [**Watch the 90-second demo**](https://hackathon-phi-lemon.vercel.app/media/not-a-bot-demo.mp4) · [How it works](#how-a-round-plays) · [Run it locally](#run-it-locally)
 
 ![Next.js](https://img.shields.io/badge/Next.js-16-0d0b09?logo=nextdotjs) ![CometChat](https://img.shields.io/badge/CometChat-realtime-f2a33a) ![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript&logoColor=white) ![Three.js](https://img.shields.io/badge/React_Three_Fiber-3D-0d0b09?logo=threedotjs) ![Tests](https://img.shields.io/badge/tests-114_passing-2e7d32)
 
@@ -18,9 +18,9 @@ A real-time social deduction game in a live group chat. Talk, bluff, interrogate
 
 <div align="center">
 
-[![NOT A BOT: 90-second demo. Click to play.](docs/media/demo-poster.jpg)](https://github.com/anshvarshney1502/hackathon/blob/main/docs/media/not-a-bot-demo.mp4)
+[![NOT A BOT: 90-second demo. Click to play.](docs/media/demo-poster.jpg)](https://hackathon-phi-lemon.vercel.app/media/not-a-bot-demo.mp4)
 
-**[▶ Click to play the demo](https://github.com/anshvarshney1502/hackathon/blob/main/docs/media/not-a-bot-demo.mp4)**: a full solo case, narrated from the lobby to the reveal.
+**[▶ Click to play the demo](https://hackathon-phi-lemon.vercel.app/media/not-a-bot-demo.mp4)**: a full solo case, narrated from the lobby to the reveal.
 
 </div>
 

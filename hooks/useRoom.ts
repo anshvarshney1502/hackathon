@@ -103,6 +103,23 @@ export function useRoom(roomId: string, displayName: string | null) {
     dispatch({ t: "custom", evts: customs });
   }, [guid]);
 
+  // Fallback for the realtime socket: pick up recent chat lines it may have missed.
+  // The reducer drops duplicates by message id, so this is safe to call often.
+  const pollChat = useCallback(async () => {
+    const CometChat = sdk.current;
+    if (!CometChat) return;
+    const msgs = (await new CometChat.MessagesRequestBuilder()
+      .setGUID(guid)
+      .setLimit(30)
+      .setCategories(["message"])
+      .setTypes(["text"])
+      .hideReplies(true)
+      .build()
+      .fetchPrevious()) as BaseMessage[];
+    const chat = msgs.filter((m) => m.getCategory() === "message" && m.getType() === "text").map((m) => toChat(m as TextMessage));
+    if (chat.length) dispatch({ t: "history", messages: chat, voted: [] });
+  }, [guid]);
+
   const fullSync = useCallback(async () => {
     await syncState();
     await Promise.all([loadMembers(), loadHistory()]);
@@ -511,6 +528,7 @@ export function useRoom(roomId: string, displayName: string | null) {
 
   const lastPulse = useRef(0);
   const lastLobbySync = useRef(0);
+  const lastChatPoll = useRef(0);
   useEffect(() => {
     if (s.status !== "ready") return;
     const id = setInterval(() => {
@@ -533,6 +551,10 @@ export function useRoom(roomId: string, displayName: string | null) {
       if (game.phase === "LOBBY" && now - lastLobbySync.current > 5000) {
         lastLobbySync.current = now;
         void syncState().catch(() => {});
+      }
+      if (game.phase !== "LOBBY" && now - lastChatPoll.current > 3000) {
+        lastChatPoll.current = now;
+        void pollChat().catch(() => {});
       }
       if (!host) return;
       if (game.phase === "CHAT") {
@@ -557,7 +579,7 @@ export function useRoom(roomId: string, displayName: string | null) {
       }
     }, 2500);
     return () => clearInterval(id);
-  }, [s.status, roomId, advance, loadMembers, requestBotPlan, syncState]);
+  }, [s.status, roomId, advance, loadMembers, requestBotPlan, syncState, pollChat]);
 
   return {
     ...s,

@@ -197,7 +197,10 @@ export function reducer(s: State, a: Action): State {
     }
     case "history": {
       const known = new Set(s.messages.map((m) => m.key));
-      const merged = [...a.messages.filter((m) => !known.has(m.key)), ...s.messages].sort((x, y) => x.at - y.at);
+      const knownIds = new Set(s.messages.map((m) => m.id).filter((id) => id !== null));
+      const fresh = a.messages.filter((m) => !known.has(m.key) && !(m.id !== null && knownIds.has(m.id)));
+      if (fresh.length === 0 && a.voted.length === 0) return s;
+      const merged = [...fresh, ...s.messages].sort((x, y) => x.at - y.at);
       const voted = { ...s.voted };
       for (const uid of a.voted) voted[uid] = true;
       return { ...s, messages: merged.slice(-MAX_MESSAGES), voted };

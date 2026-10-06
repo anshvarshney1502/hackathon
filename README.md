@@ -6,7 +6,7 @@
 
 A real-time social deduction game in a live group chat. Talk, bluff, interrogate, then stamp every player **HUMAN** or **BOT**.
 
-[**▶ Play it live**](https://hackathon-phi-lemon.vercel.app) · [**Watch the 90-second demo**](https://hackathon-phi-lemon.vercel.app/media/not-a-bot-demo.mp4) · [How it works](#how-a-round-plays) · [Run it locally](#run-it-locally)
+[**▶ Play it live**](https://hackathon-phi-lemon.vercel.app) · [**Watch the 90-second demo**](https://hackathon-phi-lemon.vercel.app/media/not-a-bot-demo.mp4) · [How it works](#how-a-round-plays) · [CometChat MCP](#how-we-used-the-cometchat-mcp-server) · [Run it locally](#run-it-locally)
 
 ![Next.js](https://img.shields.io/badge/Next.js-16-0d0b09?logo=nextdotjs) ![CometChat](https://img.shields.io/badge/CometChat-realtime-f2a33a) ![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript&logoColor=white) ![Three.js](https://img.shields.io/badge/React_Three_Fiber-3D-0d0b09?logo=threedotjs) ![Tests](https://img.shields.io/badge/tests-114_passing-2e7d32)
 
@@ -74,6 +74,24 @@ Most Bot-Like Human, Most Trusted, Biggest Suspect, Chaos Agent, Best Defense.
 
 ---
 
+## Why it's interesting
+
+- **A reverse Turing test you play with friends.** Most AI demos ask "can the AI help you?" This one asks "can you even tell it's an AI?",
+  and turns the answer into a party game.
+- **Bots that act like people, not assistants.** Each of the 12 AI personas has a hometown, job, opinions, typing style, typo rate and
+  grudges. A new temperament per case means the same persona plays differently each time. Bots argue with *each other*, remember what you
+  said ("wait, you're from Jaipur right?"), and chase a **secret objective** you only find out about at the reveal.
+- **Real secrecy, not UI tricks.** Real names are encrypted, aliases change every round, ballots are encrypted in the browser, and the bot
+  roster is cryptographically committed at the start and verified at the end. Even inspecting network traffic won't tell you who's a bot.
+- **Every number at the reveal is counted, never generated.** Votes, trust, "fooled X people", objectives and awards are computed
+  deterministically from the actual game.
+- **No database.** The entire game runs on CometChat: users, rooms, real-time chat, presence, typing, custom events, and server-authoritative
+  state in group metadata.
+- **Solo or multiplayer on one engine.** Play alone against five AIs, or with up to five friends. There is always at least one bot,
+  and nobody knows how many.
+
+---
+
 ## Built with CometChat
 
 CometChat carries the whole game: identity, rooms, real-time chat, presence, typing, game events and every bot message.
@@ -111,6 +129,45 @@ flowchart LR
   PLAN -->|REST onBehalfOf| M
   UI -->|signed session| S & RM & ADV & PLAN & PULSE
 ```
+
+### How we used the CometChat MCP server
+
+Every CometChat call in this codebase was researched through the **official [CometChat Docs MCP server](https://mcp.cometchat.com/mcp)**
+before any code was written. We did not guess from memory.
+
+| | |
+|---|---|
+| **Endpoint** | [`https://mcp.cometchat.com/mcp`](https://mcp.cometchat.com/mcp) (MCP Streamable HTTP, server "CometChat Docs" v0.1.6) |
+| **Client** | [`scripts/cometchat-mcp.sh`](scripts/cometchat-mcp.sh), a tiny curl client (initialize → initialized → call), so any agent or human can re-run a lookup |
+| **Tools used** | `list_cometchat_bundles`, `get_cometchat_implementation_bundle`, `search_cometchat_docs`, `fetch_cometchat_doc_page` |
+| **Skills pack** | The `cometchat://skills/overview` resource was read first, as the server instructs, then the implementation bundles (`js-sdk-messaging-basics`, `presence-and-typing`, `moderation-setup`, `multi-tenant-chat`) |
+| **Full trail** | [**docs/MCP_LOG.md**](docs/MCP_LOG.md): every bundle, page and search, with the decision it led to |
+
+Re-run any lookup yourself:
+
+```bash
+scripts/cometchat-mcp.sh tools/call '{"name":"list_cometchat_bundles","arguments":{}}'
+scripts/cometchat-mcp.sh tools/call '{"name":"search_cometchat_docs","arguments":{"query":"send message on behalf of user REST"}}'
+```
+
+What the MCP research decided (details and sources in [docs/MCP_LOG.md](docs/MCP_LOG.md)):
+
+| Decision | MCP source | Where in the code |
+|---|---|---|
+| Server-minted **Auth Tokens**; the Auth Key never reaches the browser | bundle `multi-tenant-chat`, `/rest-api/auth-tokens/create` | `app/api/session/route.ts` |
+| SDK loaded **client-only** in Next.js; `init()` before anything else | `/sdk/javascript/setup-sdk` (SSR compatibility) | `lib/client/cometchat.ts` |
+| Rooms are **private groups**, created and joined server-side | `/rest-api/groups/create`, `/rest-api/group-members/add-members` | `lib/server/room.ts` |
+| Game state lives in **group metadata** (5 KB cap respected) | `/rest-api/groups/update` | `lib/server/room.ts`, `lib/game/types.ts` |
+| Bots speak via REST **`onBehalfOf`** | `/rest-api/messages/send-message` | `lib/server/bots.ts`, `lib/server/cometchat.ts` |
+| Votes, trust, defenses, events as **custom messages** | `/sdk/javascript/send-message`, `/receive-message` | `hooks/useRoom.ts` |
+| Typing and presence | bundle `presence-and-typing` | `hooks/useRoom.ts` |
+| REST **rate limits** and retry on 429 | `/rest-api/rate-limits` | `lib/server/cometchat.ts` |
+| Reconnect and resync | `/sdk/javascript/connection-status` | `hooks/useRoom.ts` |
+| The **Report** button | bundle `moderation-setup`, `/sdk/javascript/flag-message` | `app/api/report/route.ts` |
+| Free-plan **100-user** limit surfaced, never hidden | `/rest-api/users/create` (`ERR_PLAN_QUOTA_RESTRICTION`) | `app/api/session/route.ts` |
+
+When the docs disagreed (for example, the overview showed REST `/v3.0` while the OpenAPI pages use `/v3` with a lowercase `apikey`
+header), we followed the reference pages and logged why.
 
 ---
 

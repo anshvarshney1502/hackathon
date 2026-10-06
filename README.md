@@ -138,6 +138,7 @@ before any code was written. We did not guess from memory.
 | | |
 |---|---|
 | **Endpoint** | [`https://mcp.cometchat.com/mcp`](https://mcp.cometchat.com/mcp) (MCP Streamable HTTP, server "CometChat Docs" v0.1.6) |
+| **Connector** | [`.mcp.json`](.mcp.json) registers the server as `cometchat-docs`, so Claude Code and other MCP clients pick it up automatically when they open this repo |
 | **Client** | [`scripts/cometchat-mcp.sh`](scripts/cometchat-mcp.sh), a tiny curl client (initialize → initialized → call), so any agent or human can re-run a lookup |
 | **Tools used** | `list_cometchat_bundles`, `get_cometchat_implementation_bundle`, `search_cometchat_docs`, `fetch_cometchat_doc_page` |
 | **Skills pack** | The `cometchat://skills/overview` resource was read first, as the server instructs, then the implementation bundles (`js-sdk-messaging-basics`, `presence-and-typing`, `moderation-setup`, `multi-tenant-chat`) |

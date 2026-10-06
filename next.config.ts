@@ -13,6 +13,18 @@ const nextConfig: NextConfig = {
   // Extra local "players" during dev: http://127.0.0.1:3000 and http://[::1]:3000 each get their own localStorage.
   allowedDevOrigins: ["127.0.0.1", "::1", "[::1]"],
   poweredByHeader: false,
+  // Production has one public address. Per-deployment *.vercel.app URLs redirect to it, so invite links are always shareable.
+  async redirects() {
+    if (process.env.VERCEL_ENV !== "production") return [];
+    return [
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "(?!hackathon-phi-lemon\\.vercel\\.app$).+\\.vercel\\.app" }],
+        destination: "https://hackathon-phi-lemon.vercel.app/:path*",
+        permanent: false,
+      },
+    ];
+  },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },

@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Launch-video work files (not app code).
+    "brag-output/**",
   ]),
 ]);
 

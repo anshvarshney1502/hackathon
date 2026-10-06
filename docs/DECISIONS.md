@@ -337,3 +337,11 @@ Verified with live solo cases (`SIM_TRANSCRIPT=1 npm run sim -- 1`): bots accuse
 
 **Problem.** The free CometChat plan caps the app at 100 users. Test runs and the abandoned Quick Match work had used all 100 (77 test accounts). New invitees failed at `POST /api/session` with a 402 before they reached the room. The host saw an empty lobby and started a "solo" case.
 **Decision.** `ERR_PLAN_QUOTA_RESTRICTION` now maps to a 503 `player_limit` response with a clear message. `/api/session` takes the optional `roomId` and writes `lobbyNotice` into the lobby state, so the host sees "Someone couldn't get in". The host polls the lobby every 5 s. Returning players reuse their uid and need no new account. Bots are seated only at start. Clean up with `npm run cleanup:test-users` (a dry run; `-- --yes` deletes test-named accounts only and never touches real players, hosts or the bot pool).
+
+## D34: Chat never depends on the realtime socket alone
+
+**Problem.** In production the CometChat socket sometimes did not deliver bot messages. Players never saw the bots, and the host (which
+triggers bot replies on new messages) went silent too. Separately, the host detected new messages by list length, which stops growing
+once the 200-message cap is reached.
+**Decision.** Every client polls the latest 30 text messages every 3 s outside the lobby; the reducer de-duplicates by message id.
+The host now tracks the newest message key instead of the count.

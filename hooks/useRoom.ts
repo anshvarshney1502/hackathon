@@ -516,13 +516,14 @@ export function useRoom(roomId: string, displayName: string | null) {
 
   /* ---------- host duties (any client takes over if the host stalls) ---------- */
 
-  const lastMsgCount = useRef(0);
+  // Track the newest message by key, not by count: the list is capped, so its length stops growing.
+  const lastMsgKey = useRef<string | null>(null);
   const idleNudgedFor = useRef<number | null>(null);
   useEffect(() => {
     if (!isHost || s.game.phase !== "CHAT") return;
-    const incoming = s.messages.length > lastMsgCount.current;
-    lastMsgCount.current = s.messages.length;
     const last = s.messages.at(-1);
+    const incoming = !!last && last.key !== lastMsgKey.current;
+    lastMsgKey.current = last?.key ?? null;
     if (incoming && last && last.uid !== s.me?.uid && last.status === "sent") requestBotPlan("reply");
   }, [s.messages, isHost, s.game.phase, s.me?.uid, requestBotPlan]);
 
